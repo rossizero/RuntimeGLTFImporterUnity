@@ -16,15 +16,13 @@ public class main : MonoBehaviour
         Invoke("do_stuff", 1.313f);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     void do_stuff()
     {
-        var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", "", false);
+        var extensions = new[] {
+            new ExtensionFilter("GLTF Files", "gltf"),
+            new ExtensionFilter("All Files", "*" ),
+        };
+        var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
         load_gltf(paths[0]);
     }
 
@@ -37,12 +35,13 @@ public class main : MonoBehaviour
             AnisotropicFilterLevel = 3,
             NodeNameMethod = NameImportMethod.OriginalUnique
         };
-        path = @"C:/Users/develop/Downloads/Sample.gltf";
+
+        // because we're handling local files only
         byte[] data = File.ReadAllBytes(path);
         var gltf = new GltfImport(null, null, null, logger);
 
         // The URI of the original data is important for resolving relative URIs within the glTF
-        // Note: Make sure to provide all files that the gltf references to in path
+        // Note: Make sure to provide all files in "path" that the gltf references.
         bool success = await gltf.Load(data, new Uri(path), settings);
         if (success) {
             try {
